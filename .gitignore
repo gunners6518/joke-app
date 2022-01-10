@@ -9,3 +9,7 @@ node_modules
 [url "github:"]
     InsteadOf = https://github.com/
     InsteadOf = git@github.com:
+
+
+/prisma/dev.db
+.env
