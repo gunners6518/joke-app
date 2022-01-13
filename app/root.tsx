@@ -24,6 +24,8 @@ export const links: LinksFunction = () => {
   ];
 };
 
+<script>console.log("aaaa");</script>;
+
 export default function App() {
   return (
     <html lang="en">
