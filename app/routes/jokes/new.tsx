@@ -1,6 +1,7 @@
 import { ActionFunction, json, redirect, useActionData } from "remix";
 import { db } from "~/utils/db.server";
 
+// フォームバリデーションの追加
 function validateJokeContent(content: string) {
   if (content.length < 10) {
     return "That joke too short";
@@ -25,14 +26,16 @@ type ActionData = {
   };
 };
 
+// 送信エラーの定義
 const badRequest = (data: ActionData) => json(data, { status: 400 });
 
 export const action: ActionFunction = async ({ request }) => {
+  // formを取得
   const form = await request.formData();
   const content = form.get("content");
   const name = form.get("name");
 
-  // バリデーション
+  // undefiendなどを除外する
   if (typeof name !== "string" || typeof content !== "string") {
     {
       return badRequest({
@@ -41,6 +44,7 @@ export const action: ActionFunction = async ({ request }) => {
     }
   }
 
+  // バリデーションメッセージを取得
   const fieldErrors = {
     name: validateJokeName(name),
     content: validateJokeContent(content),
