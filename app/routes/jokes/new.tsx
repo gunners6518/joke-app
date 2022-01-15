@@ -1,5 +1,7 @@
-import { ActionFunction, json, redirect, useActionData } from "remix";
+import type { ActionFunction } from "remix";
+import { useActionData, redirect, json } from "remix";
 import { db } from "~/utils/db.server";
+import { requireUserId } from "~/utils/session.server";
 
 // フォームバリデーションの追加
 function validateJokeContent(content: string) {
@@ -31,6 +33,7 @@ const badRequest = (data: ActionData) => json(data, { status: 400 });
 
 export const action: ActionFunction = async ({ request }) => {
   // formを取得
+  const userId = await requireUserId(request);
   const form = await request.formData();
   const content = form.get("content");
   const name = form.get("name");
@@ -55,7 +58,9 @@ export const action: ActionFunction = async ({ request }) => {
     return badRequest({ fieldErrors, fields });
   }
 
-  const joke = await db.joke.create({ data: fields });
+  const joke = await db.joke.create({
+    data: { ...fields, jokesterId: userId },
+  });
   return redirect(`/jokes/${joke.id}`);
 };
 
