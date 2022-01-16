@@ -1,6 +1,6 @@
-import { db } from "./db.server";
-import { createCookieSessionStorage, redirect } from "remix";
 import bcrypt from "bcryptjs";
+import { createCookieSessionStorage, redirect } from "remix";
+import { db } from "./db.server";
 
 type LoginForm = {
   username: string;
@@ -8,7 +8,7 @@ type LoginForm = {
 };
 
 // ユーザーが登録さてていれば、Userを、いなければnullを返す
-export const login = async ({ username, password }: LoginForm) => {
+export async function login({ username, password }: LoginForm) {
   const user = await db.user.findUnique({
     where: { username },
   });
@@ -19,7 +19,7 @@ export const login = async ({ username, password }: LoginForm) => {
   if (!isCorrectPassword) return null;
 
   return user;
-};
+}
 
 const sessionSecret = process.env.SESSION_SECRET;
 if (!sessionSecret) {
@@ -65,8 +65,39 @@ export async function requireUserId(
   return userId;
 }
 
+export async function getUser(request: Request) {
+  //userId取得
+  const userId = await getUserId(request);
+  if (typeof userId !== "string") {
+    return null;
+  }
+  try {
+    // userIdからuserデータを取得
+    const user = await db.user.findUnique({
+      where: { id: userId },
+    });
+    return user;
+  } catch {
+    //userが取得出来なければlogout
+    throw logout(request);
+  }
+}
+
+export async function logout(request: Request) {
+  // requestからcookie経由でsessionを取得
+  const session = await storage.getSession(request.headers.get("cookie"));
+  // sessionを破棄してlogin画面に遷移
+  return redirect("/login", {
+    headers: {
+      "Set-Cookie": await storage.destroySession(session),
+    },
+  });
+}
+
+// 新しいsessionを作成する
 export async function createUserSession(userId: string, redirecTo: string) {
   const session = await storage.getSession();
+  // userIDをsessionに保存
   session.set("userId", userId);
   return redirect(redirecTo, {
     headers: {
