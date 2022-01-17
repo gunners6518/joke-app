@@ -1,22 +1,22 @@
 import type { ActionFunction, LinksFunction } from "remix";
-import { useActionData, json, Link, useSearchParams } from "remix";
+import { useActionData, json, useSearchParams, Link } from "remix";
 import { db } from "~/utils/db.server";
-import { createUserSession, login } from "~/utils/session.server";
+import { createUserSession, login, register } from "~/utils/session.server";
 import stylesUrl from "../styles/login.css";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: stylesUrl }];
 };
 
-function validateUserName(username: unknown) {
+function validateUsername(username: unknown) {
   if (typeof username !== "string" || username.length < 3) {
-    return `Username must be at least 3 characters long`;
+    return `Usernames must be at least 3 characters long`;
   }
 }
 
-function validatePassward(passward: unknown) {
-  if (typeof passward !== "string" || passward.length < 6) {
-    return `Passward must be at least 6 characters long`;
+function validatePassword(password: unknown) {
+  if (typeof password !== "string" || password.length < 6) {
+    return `Passwords must be at least 6 characters long`;
   }
 }
 
@@ -41,7 +41,6 @@ export const action: ActionFunction = async ({ request }) => {
   const username = form.get("username");
   const password = form.get("password");
   const redirectTo = form.get("redirectTo") || "/jokes";
-
   if (
     typeof loginType !== "string" ||
     typeof username !== "string" ||
@@ -55,8 +54,8 @@ export const action: ActionFunction = async ({ request }) => {
 
   const fields = { loginType, username, password };
   const fieldErrors = {
-    username: validateUserName(username),
-    password: validatePassward(password),
+    username: validateUsername(username),
+    password: validatePassword(password),
   };
   if (Object.values(fieldErrors).some(Boolean))
     return badRequest({ fieldErrors, fields });
@@ -65,14 +64,13 @@ export const action: ActionFunction = async ({ request }) => {
     case "login": {
       const user = await login({ username, password });
       if (!user) {
-        return {
+        return badRequest({
           fields,
           formError: `Username/Password combination is incorrect`,
-        };
+        });
       }
       return createUserSession(user.id, redirectTo);
     }
-
     case "register": {
       const userExists = await db.user.findFirst({
         where: { username },
@@ -83,12 +81,14 @@ export const action: ActionFunction = async ({ request }) => {
           formError: `User with username ${username} already exists`,
         });
       }
-      // create the user
-      // create their session and redirect to /jokes
-      return badRequest({
-        fields,
-        formError: "Not implemented",
-      });
+      const user = await register({ username, password });
+      if (!user) {
+        return badRequest({
+          fields,
+          formError: `Something went wrong trying to create a new user.`,
+        });
+      }
+      return createUserSession(user.id, redirectTo);
     }
     default: {
       return badRequest({

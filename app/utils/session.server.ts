@@ -7,6 +7,17 @@ type LoginForm = {
   password: string;
 };
 
+export async function register({ username, password }: LoginForm) {
+  // passwordをhash化する
+  const passwordHash = await bcrypt.hash(password, 10);
+  return db.user.create({
+    data: {
+      username,
+      passwordHash,
+    },
+  });
+}
+
 // ユーザーが登録さてていれば、Userを、いなければnullを返す
 export async function login({ username, password }: LoginForm) {
   const user = await db.user.findUnique({
