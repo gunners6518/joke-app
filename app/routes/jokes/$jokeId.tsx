@@ -1,4 +1,10 @@
-import { ActionFunction, LoaderFunction, MetaFunction, useParams } from "remix";
+import {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+  redirect,
+  useParams,
+} from "remix";
 import { Link, useLoaderData, useCatch } from "remix";
 import type { Joke } from "@prisma/client";
 import { db } from "~/utils/db.server";
@@ -39,7 +45,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const form = request.formData();
   const form = await request.formData();
   if (form.get("_method") === "delete") {
     const userId = await requireUserId(request);
