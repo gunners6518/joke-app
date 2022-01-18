@@ -1,53 +1,62 @@
-# Welcome to Remix!
+# joke-app
+Created a joke-app for the official remix tutorial  
+The following requirements are met.
 
-- [Remix Docs](https://remix.run/docs)
 
-## Development
+- user registration by authentication
+- Maintaining user and joke data using prisma
+- joke crud
+- SEO with Meta Tags
 
-From your terminal:
 
-```sh
-npm run dev
+
+reference  
+https://remix.run/docs/en/v1/tutorials/jokes
+
+
+## DataBase
+```prisma
+model User {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  username     String   @unique
+  passwordHash String
+  jokes        Joke[]
+}
+
+model Joke {
+  id         String   @id @default(uuid())
+  jokesterId String
+  jokester   User     @relation(fields: [jokesterId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  name       String
+  content    String
+}
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
 
-## Deployment
+# deply
 
-First, build your app for production:
+Comming Soon
 
-```sh
-npm run build
+## true structure
+
 ```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
-
-### Using a Template
-
-When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
-
-```sh
-cd ..
-# create a new project, and pick a pre-configured host
-npx create-remix@latest
-cd my-new-remix-app
-# remove the new project's app (not the old one!)
-rm -rf app
-# copy your app over
-cp -R ../my-old-remix-app/app app
+remix-jokes
+├── README.md
+├── app
+│   ├── entry.client.tsx
+│   ├── entry.server.tsx
+│   ├── root.tsx
+│   └── routes
+│       └── index.tsx
+├── package-lock.json
+├── package.json
+├── public
+│   └── favicon.ico
+├── remix.config.js
+├── remix.env.d.ts
+└── tsconfig.json
 ```
