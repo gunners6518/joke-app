@@ -37,7 +37,7 @@ model Joke {
 ```
 
 
-# deply
+# deploy
 
 Comming Soon
 
