@@ -36,7 +36,7 @@ model Joke {
 
 # deploy
 
-Comming Soon!!
+https://joke-app.fly.dev/
 
 ## true structure
 
