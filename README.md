@@ -1,20 +1,18 @@
 # joke-app
+
 Created a joke-app for the official remix tutorial  
 The following requirements are met.
-
 
 - user registration by authentication
 - Maintaining user and joke data using prisma
 - joke crud
 - SEO with Meta Tags
 
-
-
 reference  
 https://remix.run/docs/en/v1/tutorials/jokes
 
-
 ## DataBase
+
 ```prisma
 model User {
   id           String   @id @default(uuid())
@@ -36,8 +34,7 @@ model Joke {
 }
 ```
 
-
-# deply
+# deploy
 
 Comming Soon
 
