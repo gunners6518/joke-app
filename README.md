@@ -36,7 +36,7 @@ model Joke {
 
 # deploy
 
-Comming Soon
+Comming Soon!!
 
 ## true structure
 
